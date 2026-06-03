@@ -1,0 +1,222 @@
+{
+  "info": {
+    "name": "API ToDoApp",
+    "description": "Colección de pruebas para la API REST de gestión de tareas. Autor: Andres Felipe Jimenez Ramirez - Programación Web U10 Post-Contenido 2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "tareaId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1 - POST Crear tarea",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201 Created', () => {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Respuesta contiene id numerico', () => {",
+              "    const b = pm.response.json();",
+              "    pm.expect(b).to.have.property('id');",
+              "    pm.expect(b.id).to.be.a('number');",
+              "    pm.collectionVariables.set('tareaId', b.id);",
+              "});",
+              "",
+              "pm.test('Respuesta contiene titulo correcto', () => {",
+              "    const b = pm.response.json();",
+              "    pm.expect(b.titulo).to.eql('Tarea de prueba Postman');",
+              "});",
+              "",
+              "pm.test('Tarea creada con completada = false', () => {",
+              "    const b = pm.response.json();",
+              "    pm.expect(b.completada).to.be.false;",
+              "});",
+              "",
+              "pm.test('Tiempo de respuesta < 500ms', () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Tarea de prueba Postman\",\n  \"descripcion\": \"Descripcion generada por la coleccion de pruebas\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/tareas",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tareas"]
+        }
+      }
+    },
+    {
+      "name": "2 - GET Obtener tarea por ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200 OK', () => {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Respuesta contiene el ID correcto', () => {",
+              "    const b = pm.response.json();",
+              "    const idEsperado = pm.collectionVariables.get('tareaId');",
+              "    pm.expect(b.id).to.eql(Number(idEsperado));",
+              "});",
+              "",
+              "pm.test('Titulo coincide con el creado', () => {",
+              "    const b = pm.response.json();",
+              "    pm.expect(b.titulo).to.eql('Tarea de prueba Postman');",
+              "});",
+              "",
+              "pm.test('Content-Type es application/json', () => {",
+              "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+              "});",
+              "",
+              "pm.test('Tiempo de respuesta < 500ms', () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/tareas/{{tareaId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tareas", "{{tareaId}}"]
+        }
+      }
+    },
+    {
+      "name": "3 - PATCH Completar tarea",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200 OK', () => {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('completada es true despues del PATCH', () => {",
+              "    const b = pm.response.json();",
+              "    pm.expect(b.completada).to.be.true;",
+              "});",
+              "",
+              "pm.test('ID sigue siendo el mismo', () => {",
+              "    const b = pm.response.json();",
+              "    const idEsperado = pm.collectionVariables.get('tareaId');",
+              "    pm.expect(b.id).to.eql(Number(idEsperado));",
+              "});",
+              "",
+              "pm.test('Tiempo de respuesta < 500ms', () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "url": {
+          "raw": "{{baseUrl}}/api/tareas/{{tareaId}}/completar",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tareas", "{{tareaId}}", "completar"]
+        }
+      }
+    },
+    {
+      "name": "4 - GET Verificar tarea completada",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200 OK', () => {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('La tarea sigue existiendo despues de completar', () => {",
+              "    const b = pm.response.json();",
+              "    pm.expect(b).to.have.property('id');",
+              "    pm.expect(b).to.have.property('titulo');",
+              "});",
+              "",
+              "pm.test('completada permanece en true', () => {",
+              "    const b = pm.response.json();",
+              "    pm.expect(b.completada).to.be.true;",
+              "});",
+              "",
+              "pm.test('Tiempo de respuesta < 500ms', () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/tareas/{{tareaId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tareas", "{{tareaId}}"]
+        }
+      }
+    },
+    {
+      "name": "5 - GET Tarea inexistente (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 404 Not Found', () => {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "pm.test('Cuerpo de respuesta indica tarea no encontrada', () => {",
+              "    const texto = pm.response.text();",
+              "    pm.expect(texto).to.include('no encontrada');",
+              "});",
+              "",
+              "pm.test('Tiempo de respuesta < 500ms', () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/tareas/99999",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tareas", "99999"]
+        }
+      }
+    }
+  ]
+}
